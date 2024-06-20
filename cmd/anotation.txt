@@ -1,0 +1,4 @@
+# aonde fica o core do programa, o package main e a func main()
+
+Ex:
+    cmd > server > main.go > func main(){}

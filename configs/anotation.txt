@@ -1,0 +1,3 @@
+# configs iniciais para o boot da aplicaçao
+
+    - variavies de ambientes
