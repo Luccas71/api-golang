@@ -1,2 +1,0 @@
-# arquivos que vão AUXILIAR nos testes, 
-# nao são necessariamentes arquivos .go

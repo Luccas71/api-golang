@@ -1,2 +1,0 @@
-# guardar especificações da api
-# swagger, documentações
