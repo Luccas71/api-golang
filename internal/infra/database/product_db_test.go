@@ -83,3 +83,59 @@ func TestProductFindByID(t *testing.T) {
     assert.Equal(t, product.Name, "Product 1")
     assert.Equal(t, product.Price, 10.00)
 }
+
+func TestUpdateProduct(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+    if err!= nil {
+        t.Error(err)
+    }
+
+    db.AutoMigrate(&entity.Product{})
+    productDB := NewProduct(db)
+
+    p, err := entity.NewProduct("Product 1", 10.00)
+    assert.NoError(t, err)
+
+    db.Create(p)
+
+    product, err := productDB.FindByID(p.ID.String())
+    assert.NoError(t, err)
+    assert.NotNil(t, product)
+    assert.Equal(t, product.Name, "Product 1")
+    assert.Equal(t, product.Price, 10.00)
+
+    product.Name = "Product 2"
+	err = productDB.Update(product)
+	assert.NoError(t, err)
+	product, err = productDB.FindByID(p.ID.String())
+	assert.NoError(t, err)
+	assert.NotNil(t, product)
+	assert.Equal(t, product.Name, "Product 2")
+}
+
+func TestDeleteProduct(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+    if err!= nil {
+        t.Error(err)
+    }
+
+    db.AutoMigrate(&entity.Product{})
+    productDB := NewProduct(db)
+
+    p, err := entity.NewProduct("Product 1", 10.00)
+    assert.NoError(t, err)
+
+    db.Create(p)
+
+    product, err := productDB.FindByID(p.ID.String())
+    assert.NoError(t, err)
+    assert.NotNil(t, product)
+    assert.Equal(t, product.Name, "Product 1")
+    assert.Equal(t, product.Price, 10.00)
+
+    err = productDB.Delete(p.ID.String())
+    assert.NoError(t, err)
+}
+
+
+    
