@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/Luccas1/api-golang/configs"
-	"github.com/Luccas1/api-golang/internal/dto"
 	"github.com/Luccas1/api-golang/internal/entity"
 	"github.com/Luccas1/api-golang/internal/infra/database"
+	"github.com/Luccas1/api-golang/internal/infra/webserver/handlers"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -24,42 +25,14 @@ func main() {
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
 
-	http.ListenAndServe(":8080", nil)
-}
+	productDB := database.NewProduct(db)
+	productHandler := handlers.NewProductHandler(productDB)
 
-type ProductHandler struct {
-	ProductDB database.ProductInterface
-}
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Post("/products", productHandler.CreateProduct)
+	r.Get("/products/{id}", productHandler.GetProduct)
+	r.Put("/products/{id}", productHandler.UpdateProduct)
 
-func NewProductHandler(db database.ProductInterface) *ProductHandler {
-	return &ProductHandler{
-		ProductDB: db,
-	}
-}
-
-func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
-
-	//recebendo dados pelo body com dto
-	var product dto.CreateProductDTO
-	err := json.NewDecoder(r.Body).Decode(&product)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	//criando um novo produto
-	//normalmente está no casos de uso
-	p, err := entity.NewProduct(product.Name, product.Price)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	err = h.ProductDB.Create(p)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
+	http.ListenAndServe(":8000", r)
 }
