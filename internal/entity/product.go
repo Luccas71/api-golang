@@ -7,6 +7,13 @@ import (
 	"github.com/Luccas1/api-golang/pkg/entity"
 )
 
+/*
+[x] package errors personalizados
+[x] product structure
+[] func new product
+[] func validade
+*/
+
 var (
 	ErrorIDIsRequired    = errors.New("id is required")
 	ErrorInvalidID       = errors.New("invalid id")
@@ -23,17 +30,19 @@ type Product struct {
 }
 
 func NewProduct(name string, price float64) (*Product, error) {
+
 	product := &Product{
 		ID:        entity.NewID(),
-        Name:      name,
-        Price:     price,
-        CreatedAt: time.Now(),
-    }
+		Name:      name,
+		Price:     price,
+		CreatedAt: time.Now(),
+	}
 	err := product.Validate()
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	return product, nil
+
 }
 
 func (p *Product) Validate() error {
